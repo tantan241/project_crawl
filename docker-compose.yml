@@ -1,0 +1,143 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-container
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: test
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - mynetwork
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    depends_on:
+      - mysql
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: root_password
+    ports:
+      - "8080:80"
+    networks:
+      - mynetwork
+
+  redis:
+    image: redis:latest
+    container_name: redis-container
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - mynetwork
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
+    container_name: elasticsearch-container
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - mynetwork
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.17.0
+    container_name: kibana-container
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    networks:
+      - mynetwork
+
+  create_index:
+    build: .
+    container_name: create-index
+    depends_on:
+      - elasticsearch
+    networks:
+      - mynetwork
+
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq-container
+    ports:
+      - "5672:5672"    # AMQP protocol
+      - "15672:15672"  # Management UI
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - mynetwork
+
+  scrapy:
+    build: .
+    container_name: scrapy-container
+    depends_on:
+      - mysql
+      - redis
+      - elasticsearch
+      - rabbitmq
+    environment:
+      - MYSQL_HOST=mysql-container
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=root_password
+      - MYSQL_DATABASE=test
+      - REDIS_HOST=redis-container
+      - ELASTICSEARCH_HOST=elasticsearch-container
+      - RABBITMQ_HOST=rabbitmq-container
+      - RABBITMQ_USER=guest
+      - RABBITMQ_PASSWORD=guest
+    volumes:
+      - ./logs:/app/logs
+      - .:/app
+    command: scrapy crawl vnexpress_category
+    networks:
+      - mynetwork
+
+  banking_consumer:
+    build: .
+    container_name: banking-consumer
+    depends_on:
+      - mysql
+      - elasticsearch
+      - rabbitmq
+    environment:
+      - MYSQL_HOST=mysql-container
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=root_password
+      - MYSQL_DATABASE=test
+      - ELASTICSEARCH_HOST=elasticsearch-container
+      - ELASTICSEARCH_PORT=9200
+      - RABBITMQ_HOST=rabbitmq-container
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USER=guest
+      - RABBITMQ_PASSWORD=guest
+    volumes:
+      - ./logs:/app/logs
+      - .:/app
+    command: python services/banking_consumer.py
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  redis_data:
+  elasticsearch_data:
+  rabbitmq_data:
