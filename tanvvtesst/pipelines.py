@@ -54,6 +54,7 @@ class MySQLPipeline:
             raise
 
     def process_item(self, item, spider):
+        # logger.error(f"TANVV {item}")
         self.item_count += 1
         if item.get('type') == 'only_insert_queue':
             return item
@@ -209,7 +210,7 @@ class RabbitMQPipeline:
             logger.info("Đã đóng kết nối RabbitMQ!")
             
     def process_item(self, item, spider):
-        logger.info(f"TANVV log : {item}")
+        # logger.info(f"TANVV log : {item}")
         try:
             if isinstance(item, dict) and item.get('article'):
                 # Chuyển đổi dữ liệu thành JSON

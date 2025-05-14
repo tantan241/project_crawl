@@ -25,7 +25,9 @@ ROBOTSTXT_OBEY = False
 CONCURRENT_REQUESTS = 32
 
 # Configure a delay for requests for the same website (default: 0)
-DOWNLOAD_DELAY = 1
+DOWNLOAD_DELAY = 2
+
+TELNETCONSOLE_ENABLED = False
 
 # Disable cookies (enabled by default)
 #COOKIES_ENABLED = False
@@ -39,17 +41,25 @@ DOWNLOAD_DELAY = 1
 #    "Accept-Language": "en",
 #}
 
+
+
 # Enable or disable spider middlewares
 # See https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 SPIDER_MIDDLEWARES = {
     'tanvvtesst.middlewares.TanvvtesstSpiderMiddleware': 543,
+    'tanvvtesst.middlewares.RedisDeduplicationMiddleware': 100,
 }
 
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
-    'tanvvtesst.middlewares.TanvvtesstDownloaderMiddleware': 543,
+    'tanvvtesst.middlewares.CustomProxyAndUserAgentMiddleware': 350,
+    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+    'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 400,
 }
+# DOWNLOADER_MIDDLEWARES = {
+#     'tanvvtesst.middlewares.TanvvtesstDownloaderMiddleware': 543,
+# }
 
 # Enable or disable extensions
 # See https://docs.scrapy.org/en/latest/topics/extensions.html
@@ -107,3 +117,10 @@ LOG_FILE = "logs/scrapy.log"
 LOG_LEVEL = "INFO"
 LOG_FORMAT = '%(asctime)s [%(name)s] %(levelname)s: %(message)s'
 LOG_DATEFORMAT = '%Y-%m-%d %H:%M:%S'
+
+# Redis Settings
+REDIS_HOST = 'localhost'
+REDIS_PORT = 6379
+REDIS_DB = 0
+REDIS_KEY_PREFIX = 'scrapy:'
+REDIS_EXPIRE_TIME = 86400  # 24 hours in seconds
