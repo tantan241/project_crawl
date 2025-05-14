@@ -10,7 +10,7 @@ import mysql.connector
 from scrapy.exceptions import NotConfigured
 import scrapy
 import logging
-from tanvvtesst.items import VnExpressItem, VnExpressCategoryItem
+from tanvvtesst.items import ArticleItem, CategoryItem
 import pika
 import json
 
@@ -60,9 +60,9 @@ class MySQLPipeline:
             return item
         if isinstance(item, dict) and item.get('type') == 'article':
             return self.process_article_dict(item['data'], spider)
-        elif isinstance(item, VnExpressCategoryItem):
+        elif isinstance(item, CategoryItem):
             return self.process_category(item)
-        elif isinstance(item, VnExpressItem):
+        elif isinstance(item, ArticleItem):
             return self.process_article(item)
         return item
 
@@ -210,7 +210,7 @@ class RabbitMQPipeline:
             logger.info("Đã đóng kết nối RabbitMQ!")
             
     def process_item(self, item, spider):
-        # logger.info(f"TANVV log : {item}")
+        logger.info(f"TANVV-log-item : {item}")
         try:
             if isinstance(item, dict) and item.get('article'):
                 # Chuyển đổi dữ liệu thành JSON

@@ -1,5 +1,5 @@
 import scrapy
-from tanvvtesst.items import VnExpressItem, VnExpressCategoryItem
+from tanvvtesst.items import ArticleItem, CategoryItem
 from datetime import datetime
 from urllib.parse import urljoin
 import logging
@@ -22,7 +22,7 @@ class Vnexpress2Spider(scrapy.Spider):
                 category_url = urljoin(response.url, category_url)
                 
                 # Tạo category item
-                category_item = VnExpressCategoryItem()
+                category_item = CategoryItem()
                 category_item['category_name'] = category_name
                 category_item['category_url'] = category_url
                 category_item['created'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -48,7 +48,7 @@ class Vnexpress2Spider(scrapy.Spider):
             for sub_cate_it in sub_cate_list:
                 sub_cate_url = 'https://vnexpress.net' + '/' + sub_cate_it.xpath('@href').get()
                 sub_cate_name = sub_cate_it.xpath('@title').get()
-                category_item = VnExpressCategoryItem()
+                category_item = CategoryItem()
                 category_item['category_name'] = sub_cate_name
                 category_item['category_url'] = sub_cate_url
                 category_item['created'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -107,7 +107,7 @@ class Vnexpress2Spider(scrapy.Spider):
         
         self.logger.info(f"Đang parse chi tiết bài viết: {article_url}")
         
-        item = VnExpressItem()
+        item = ArticleItem()
         
         # Lấy tiêu đề và mô tả
         item['title'] = response.xpath('//h1[@class="title-detail"]/text()').get()

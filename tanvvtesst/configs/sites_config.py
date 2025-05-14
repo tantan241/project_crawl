@@ -34,12 +34,6 @@ SITES_CONFIG = {
     'thanhnien': {
         'allowed_domains': ['thanhnien.vn'],
         'start_urls': ['https://thanhnien.vn'],
-        'get_categories_from_db': True,  
-        'category_table': 'web_categories',  
-        'pagination': {
-            'type': 'thanhnien',
-            'xpath_id_cate': '//input[@id="hdZoneId"]/@value'
-        },
         'xpath': {
             'categories': {
                 'main_menu': '//ul[@class="menu-nav"]/li/a',
@@ -64,4 +58,5 @@ SITES_CONFIG = {
             }
         }
     }
+    
 }

@@ -6,7 +6,7 @@
 import scrapy
 
 
-class VnExpressItem(scrapy.Item):
+class ArticleItem(scrapy.Item):
     title = scrapy.Field()
     description = scrapy.Field()
     post_content = scrapy.Field()
@@ -15,7 +15,7 @@ class VnExpressItem(scrapy.Item):
     author = scrapy.Field()
     category_id = scrapy.Field()  # FK tới bảng category
 
-class VnExpressCategoryItem(scrapy.Item):
+class CategoryItem(scrapy.Item):
     id = scrapy.Field()
     category_url = scrapy.Field()
     category_name = scrapy.Field()

@@ -1,6 +1,6 @@
 import scrapy
 from datetime import datetime
-from tanvvtesst.items import VnExpressItem
+from tanvvtesst.items import ArticleItem
 
 
 class VnexpressSpider(scrapy.Spider):
@@ -9,7 +9,7 @@ class VnexpressSpider(scrapy.Spider):
     start_urls = ["https://vnexpress.net/my-trung-quoc-dung-ap-thue-90-ngay-4884780.html"]
 
     def parse(self, response):
-        item = VnExpressItem()
+        item = ArticleItem()
         item['title'] = response.xpath('//h1[@class="title-detail"]/text()').get()
         item['description'] = response.xpath('//p[@class="description"]/text()').get()
         item['post_content'] = ' '.join(response.xpath('//article[@class="fck_detail"]//p/text()').getall())
